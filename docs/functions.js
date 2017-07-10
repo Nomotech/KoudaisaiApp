@@ -80,8 +80,8 @@ document.onkeydown = function (e){
   //console.log(e);
   oldkey[e.keyCode] = key[e.keyCode];
   key[e.keyCode] = 1;
-  //console.log(e.keyCode);
-  if(e.keyCode == 32) prePage();
+  console.log(e.keyCode);
+  if(e.keyCode == 39) prePage();
 }
 document.onkeyup = function (e){
   if(!e)e = window.event;
