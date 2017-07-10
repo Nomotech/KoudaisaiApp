@@ -61,22 +61,6 @@ scene.add(ambient);
 renderer.shadowMapEnabled = true; 
 
 
-
-//mesh 物体
-// - geometry 形状
-// - material　材質
-
-//地面
-let planeGeometry = new THREE.PlaneBufferGeometry(plane_width,plane_width);
-let planeMaterial = new THREE.MeshPhongMaterial({color:"#fff",side:THREE.DoubleSide});
-let plane = new THREE.Mesh(planeGeometry,planeMaterial);
-plane.position.set(0,0,0); // 位置を調整 rotate,scale
-plane.rotation.x = 90 * Math.PI / 180;// 初期状態だと縦になっているので、横になるように回転
-plane.receiveShadow = true;
-//scene.add(plane);
-
-
-
 let frame = {};
 let geometry = new THREE.IcosahedronGeometry( 1,1 )
 let material = new THREE.MeshPhongMaterial({ 
@@ -92,153 +76,40 @@ frame.mesh.castShadow = true;
 
 let plate_num = 16;
 let p= new Array(plate_num);
-for(i=0;i<plate_num;i++){
-	//object生成
-	p[i] = {};
-	p[i].object= new THREE.Object3D();
-	p[i].height=600;
-	p[i].width =800;
-	p[i].plate = new THREE.Object3D();
+for(i=0;i<plate_num;i++) p[i] = new Plate("./" + i + ".png");
+let heatmap = new Plate("./map.png",550,450);
+let logo = new Image("./applogo.png",705 * 1.5,195 * 1.5,0,0,300);
+p[0].plate.position.set(-800,200,-550);		//intro
+p[1].plate.position.set(-1800,200,-550);	//
 
-	//canvas
-	p[i].canvas = document.createElement('canvas');
-	p[i].canvas.width = p[i].width; 
-	p[i].canvas.height =p[i].height;
-	let ctx = p[i].canvas.getContext('2d');
-	ctx.fillStyle = '#FFFFFF';
-	ctx.textAlign = 'center';
-	ctx.textBaseline = 'middle';
-	ctx.font = "150px sans-serif";
-	ctx.fillText(i,p[i].width/2,p[i].height/2);
-	ctx.font = "30px sans-serif";
+p[2].plate.position.set(-800,-100,-400);	//内容
+p[3].plate.position.set(-1800,-100,-400);	//map
+let mapImg = new Image("./map.png",1100,900,-1800,-500,-500);
+mapImg.setScale(0.0,0.0,0.0);
+let userpointImg = new Image("./point.png",283*0.05,411*0.05,-1800,-230,-250);
+userpointImg.setScale(0.0,0.0,0.0);
+let distinationImg = new Image("./distination.png",300*0.05,300*0.05,-1800,-200,-180);
+distinationImg.setScale(0.0,0.0,0.0);
+p[4].plate.position.set(-2800,-100,-400);	//タイムスケジュール
+p[5].plate.position.set(-3800,-100,-400);	//お知らせ
+p[6].plate.position.set(-4800,-100,-400);	//密集具合
+p[7].plate.position.set(-5800,-100,-400);	//通知
+p[8].plate.position.set(-6800,-100,-400);	//投票
+p[9].plate.position.set(-7800,-100,-400);	//AR
 
-	//texture
-	//p[i].texture = new THREE.Texture(p[i].canvas);
-	p[i].texture = loader.load("./" + i + ".png");
-	p[i].texture.needsUpdate = true;
+p[10].plate.position.set(-800,-100,-700);	//heatmap
+heatmap.plate.position.set(-1800,-100,-700);
 
-	p[i].x = 0;
-	p[i].y = 0;
-	p[i].z = 0;
-	p[i].mesh = new THREE.Mesh(
-		new THREE.PlaneBufferGeometry(p[i].width,p[i].height),
-		new THREE.MeshPhongMaterial({
-			//color: 0x00FFFF ,
-			color: 0xFFFFFF ,
-			transparent:true,
-			map: p[i].texture,
-			opacity:0.9999,
-			side:THREE.DoubleSide,
-		})
-	);
-	p[i].mesh.rotation.y = 90 * Math.PI / 180;
-
-	p[i].back = new THREE.Mesh(
-		new THREE.PlaneBufferGeometry(p[i].width,p[i].height),
-		new THREE.MeshPhongMaterial({
-			//color: 0x00FFFF ,
-			color: 0x0066FF ,
-			transparent:true,
-			opacity:0.2,
-			side:THREE.DoubleSide,
-		})
-	);
-	p[i].back.rotation.y = 90 * Math.PI / 180;
-	p[i].back.position.set(-1,0,0);
-
-	p[i].frame_material = new THREE.LineBasicMaterial( { 
-		linewidth: 1,
-		transparent:true,
-		opacity:0.5,
-		color: 0x00FFFF 
-	} );
-    p[i].frame_geometry = new THREE.Geometry();
-    p[i].frame_geometry.vertices.push(new THREE.Vector3(0, p[i].height/2, p[i].width/2));
-    p[i].frame_geometry.vertices.push(new THREE.Vector3(0, p[i].height/2,-p[i].width/2));
-    p[i].frame_geometry.vertices.push(new THREE.Vector3(0,-p[i].height/2,-p[i].width/2));
-    p[i].frame_geometry.vertices.push(new THREE.Vector3(0,-p[i].height/2, p[i].width/2));
-    p[i].frame_geometry.vertices.push(new THREE.Vector3(0, p[i].height/2, p[i].width/2));
-	p[i].frame_mesh = new THREE.Line( p[i].frame_geometry, p[i].frame_material );
-
-	p[i].move_start = 0;
-
-	p[i].plate.add(p[i].mesh);
-	p[i].plate.add(p[i].back);
-	p[i].plate.add(p[i].frame_mesh);
-	p[i].object.add(p[i].plate);
-
-	object.add(p[i].object);
-	p[i].object.position.set(-20000,0,0);
-}
-
-p[0].plate.position.set(-800,200,-550);
-p[1].plate.position.set(-1800,200,-550);
-p[2].plate.position.set(-800,-100,-400);
-p[3].plate.position.set(-1800,-100,-400);
-p[4].plate.position.set(-2800,-100,-400);
-p[5].plate.position.set(-3800,-100,-400);
-p[6].plate.position.set(-4800,-100,-400);
-p[7].plate.position.set(-5800,-100,-400);
-p[8].plate.position.set(-6800,-100,-400);
-p[9].plate.position.set(-7800,-100,-400);
-p[10].plate.position.set(-800,-100,-700);
-p[11].plate.position.set(-800,0,-550);
-p[12].plate.position.set(-1800,0,-550);
-p[13].plate.position.set(-2800,0,-550);
-p[14].plate.position.set(-3800,0,-550);
+p[11].plate.position.set(-800,0,-550);		//フォーム
+p[12].plate.position.set(-1800,0,-550);		//自己位置
+p[13].plate.position.set(-2800,0,-550);		//モジュール
+p[14].plate.position.set(-3800,0,-550);		//同意
 
 
 
-let logo = {};
-logo.object= new THREE.Object3D();
-logo.height=195 * 1.5;
-logo.width = 705 * 1.5;
-logo.plate = new THREE.Object3D();
 
-//canvas
-logo.canvas = document.createElement('canvas');
-logo.canvas.width = logo.width; 
-logo.canvas.height = logo.height;
 
-//texture
-logo.texture = loader.load("./applogo.png");
-logo.texture.needsUpdate = true;
 
-logo.x = 0;
-logo.y = 0;
-logo.z = 300;
-logo.mesh = new THREE.Mesh(
-	new THREE.PlaneBufferGeometry(logo.width,logo.height),
-	new THREE.MeshPhongMaterial({
-		//color: 0x00FFFF ,
-		color: 0xFFFFFF ,
-		transparent:true,
-		map: logo.texture,
-		opacity:0.9999,
-		side:THREE.DoubleSide,
-	})
-);
-logo.mesh.rotation.y = 90 * Math.PI / 180;
-
-logo.back = new THREE.Mesh(
-	new THREE.PlaneBufferGeometry(logo.width,logo.height),
-	new THREE.MeshPhongMaterial({
-		//color: 0x00FFFF ,
-		color: 0x0066FF ,
-		transparent:true,
-		opacity:0.2,
-		side:THREE.DoubleSide,
-	})
-);
-logo.back.rotation.y = 90 * Math.PI / 180;
-
-logo.mesh.position.set(logo.x,logo.y,logo.z);
-logo.move_start = 0;
-
-logo.plate.add(logo.mesh);
-logo.object.add(logo.plate);
-
-object.add(logo.object);
 
 
 let line_num = 300;
@@ -352,3 +223,16 @@ function prePage(){
 	console.log(play);
 }
 
+function checkEndAnimation(){
+	if(	!start_time[0][0]&
+		!start_time[1][0]&
+		!start_time[2][0]&
+		!start_time[3][0]&
+		!start_time[4][0]&
+		!start_time[5][0]&
+		!start_time[6][0]
+	){
+		move_flag=0;
+		state++;
+	}
+}
