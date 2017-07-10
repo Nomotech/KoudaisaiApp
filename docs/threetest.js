@@ -194,7 +194,8 @@ let state = 0;
 let faseflag = 0;
 
 function fase(){
-	if(key[13] == 1 && move_flag == 0 || faseflag == 1){
+	//if(key[13] == 1 && move_flag == 0 || faseflag == 1){
+	if(key[39] == 1 && move_flag == 0 || faseflag == 1){
 		start_time[0][0] = t;
 		start_time[1][0] = t + 10;
 		start_time[2][0] = t + 20;
